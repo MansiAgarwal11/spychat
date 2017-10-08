@@ -50,7 +50,6 @@ def load_chats():
 
 #function to read old chats
 def read_chats():
-    load_chats()
     choice = select_a_friend()
     print Fore.RED + friends[choice].name
     if len(friends[choice].chats) == 0:
@@ -64,6 +63,7 @@ def read_chats():
 def start_chat(spy):
 
     load_friends()
+    load_chats()
 
     #reassigning spy's name as a concatenated version of his salutation and name
     spy.name = spy.salutation + " " + spy.name
