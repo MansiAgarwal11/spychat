@@ -1,4 +1,3 @@
-
 #importing necessary python libraries
 from steganography.steganography import Steganography
 from datetime import datetime
@@ -21,9 +20,9 @@ STATUS_MESSAGES = ['My name is Bond, James Bond', 'Shaken, not stirred.']
 
 
 #list to hold the details of the friends of the spy
-friend1=Spy('Sherlock', 'Mr', 27, 4.9)
-friend2=Spy('Kristen', 'Ms.', 21, 4.39)
-friend3=Spy('Watson', 'Dr.', 37, 4.95)
+# friend1=Spy('Sherlock', 'Mr', 27, 4.9)
+# friend2=Spy('Kristen', 'Ms.', 21, 4.39)
+# friend3=Spy('Watson', 'Dr.', 37, 4.95)
 friends = []
 
 
@@ -42,7 +41,7 @@ def load_chats():
         reader = csv.reader(chats_data)
 
         for row in reader:
-            chat1 = ChatMessage(row[1], row[2], bool(row[3]))
+            chat1 = ChatMessage(row[1], row[2], row[3])
             for i in friends:
                 if i.name == row[0]:
                     j= friends.index(i)
@@ -51,22 +50,20 @@ def load_chats():
 #function to read old chats
 def read_chats():
     choice = select_a_friend()
-    print Fore.RED + friends[choice].name
     if len(friends[choice].chats) == 0:
         print Fore.BLACK + "NO CONVERATION YET!"
     else:
         for i in friends[choice].chats:
-            print Fore.BLUE + str(i.time)
-            print Fore.BLACK + i.message
+            if i.sent_by_me == 'True':
+                print Fore.RED + 'You said ' + i.message + ' at ' + Fore.BLUE + str(i.time) + Fore.BLACK
+            else:
+                print Fore.RED + friends[choice].name + ' said ' + i.message + ' at ' + Fore.BLUE + str(i.time) + Fore.BLACK
 
 #function to start the application
 def start_chat(spy):
 
     load_friends()
     load_chats()
-
-    #reassigning spy's name as a concatenated version of his salutation and name
-    spy.name = spy.salutation + " " + spy.name
 
     #checking whether the spy is of correct age or not
     if spy.age > 12 and spy.age < 50:
@@ -107,6 +104,7 @@ def start_chat(spy):
 
 #function for adding a status for the spy
 def add_status(spy):
+    updated_status_message = None
     if spy.current_status_message != None:
         print "Your current status message is " + spy.current_status_message + "\n"
     else:
@@ -118,6 +116,7 @@ def add_status(spy):
 
         if len(new_status_message) > 0:
             updated_status_message = new_status_message
+            spy.current_status_message= updated_status_message
             STATUS_MESSAGES.append(updated_status_message)
 
     elif default.upper() == 'Y':
@@ -128,9 +127,12 @@ def add_status(spy):
         message_selection = int(raw_input("\nChoose from the above messages "))
         if len(STATUS_MESSAGES) >= message_selection:
             updated_status_message = STATUS_MESSAGES[(message_selection) - 1]
+            spy.current_status_message = updated_status_message
+            print "Your status has been updated to " + spy.current_status_message
+        else:
+            print 'This option is not valid. Your status was not updated'
 
-    print "Your status has been updated to " + updated_status_message
-    return updated_status_message
+    return spy.current_status_message
 
 #function to add a friend
 def add_friend():
@@ -227,18 +229,28 @@ else:
     #introducing spy
     spy.name = raw_input("What should we call you?");
     if len(spy.name)>0:
-        spy_salu= raw_input("what should we call you? Mr or Ms.")
+        spy_salu= raw_input("what should we call you? Mr or Ms.").title() #to capitalize first letter
+
         spy.name= spy.salutation + " " + spy.name   #string concatenation and re-assignment
         print "Alright " + spy.name + " I'd like to know more about you.."
 
         spy.age = 0
         spy.rating = 0.0
         spy.is_online = False
-        spy.age=input("what is your age?")
-        spy.rating = input("What is your spy rating?")
+        while not spy.age:
+            try:
+                spy.age= input("what is your age?")
+            except:
+                print 'This value is not accepted. Integer expected'
+        while not spy.rating:
+            try:
+                spy.rating = input("What is your spy rating?")
+            except:
+                print 'Rating must be a float value'
         start_chat(spy)
 
 
     else:
          print "invalid entry. please enter your name again."
+
 
